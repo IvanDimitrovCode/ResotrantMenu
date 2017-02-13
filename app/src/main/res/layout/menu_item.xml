@@ -2,15 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin">
-
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_horizontal_margin">
 
     <ImageView
         android:id="@+id/image_dish"
         android:layout_width="150dp"
-        android:layout_height="100dp"
-        android:src="@drawable/cream_soup"/>
+        android:layout_height="100dp"/>
 
     <TextView
         android:id="@+id/dish_name"
@@ -18,8 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/image_dish"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:text="Some soup"/>
+        android:paddingRight="@dimen/activity_horizontal_margin"/>
 
     <TextView
         android:id="@+id/dish_description"
@@ -28,8 +27,7 @@
         android:layout_below="@+id/dish_name"
         android:layout_toRightOf="@+id/image_dish"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:text="Soup description"/>
+        android:paddingRight="@dimen/activity_horizontal_margin"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,8 +68,7 @@
         <TextView
             android:id="@+id/vote_count"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="100"/>
+            android:layout_height="wrap_content"/>
 
         <ImageView
             android:id="@+id/image_comments"
@@ -83,8 +80,7 @@
         <TextView
             android:id="@+id/comment_count"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="100"/>
+            android:layout_height="wrap_content"/>
 
         <ImageView
             android:id="@+id/image_tags"
@@ -96,7 +92,6 @@
         <TextView
             android:id="@+id/tag_count"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="10"/>
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </RelativeLayout>

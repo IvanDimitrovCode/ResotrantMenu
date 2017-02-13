@@ -15,7 +15,7 @@ public class MenuItem {
     private String mTagsCount;
     private int    mRating;
 
-    MenuItem(Bitmap itemImage, String name, String description, String votes, String comments, String tags, int rating) {
+    public MenuItem(Bitmap itemImage, String name, String description, String votes, String comments, String tags, int rating) {
         mItemImage = itemImage;
         mName = name;
         mDescription = description;

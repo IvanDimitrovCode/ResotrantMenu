@@ -17,7 +17,7 @@ import java.util.List;
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> {
     private List<MenuItem> mMenuItems;
 
-    MenuAdapter(List<MenuItem> menuItems) {
+    public MenuAdapter(List<MenuItem> menuItems) {
         mMenuItems = menuItems;
     }
 

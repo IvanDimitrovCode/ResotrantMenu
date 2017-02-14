@@ -7,15 +7,16 @@ import android.graphics.Bitmap;
  */
 
 public class MenuItem {
-    private Bitmap mItemImage;
-    private String mName;
-    private String mDescription;
-    private String mVotesCount;
-    private String mCommentsCount;
-    private String mTagsCount;
-    private int    mRating;
+    private Bitmap         mItemImage;
+    private String         mName;
+    private String         mDescription;
+    private String         mVotesCount;
+    private String         mCommentsCount;
+    private String         mTagsCount;
+    private RestaurantNode mRestaurant;
+    private int            mRating;
 
-    public MenuItem(Bitmap itemImage, String name, String description, String votes, String comments, String tags, int rating) {
+    public MenuItem(Bitmap itemImage, String name, String description, String votes, String comments, String tags, int rating, RestaurantNode restaurant) {
         mItemImage = itemImage;
         mName = name;
         mDescription = description;
@@ -23,6 +24,7 @@ public class MenuItem {
         mCommentsCount = comments;
         mTagsCount = tags;
         mRating = rating;
+        mRestaurant = restaurant;
     }
 
     public String getName() {
@@ -79,5 +81,13 @@ public class MenuItem {
 
     public void setRating(int rating) {
         mRating = rating;
+    }
+
+    public RestaurantNode getRestaurant() {
+        return mRestaurant;
+    }
+
+    public void setRestaurant(RestaurantNode restaurant) {
+        mRestaurant = restaurant;
     }
 }

@@ -37,6 +37,8 @@ public class MenuPageAdapter extends FragmentPagerAdapter {
                 return "Main dish";
             case 2:
                 return "Desserts";
+            case 3:
+                return "Restaurants";
             default:
                 return "PAGE ERROR";
         }

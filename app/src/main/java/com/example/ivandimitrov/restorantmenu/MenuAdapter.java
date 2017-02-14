@@ -1,6 +1,10 @@
 package com.example.ivandimitrov.restorantmenu;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +20,11 @@ import java.util.List;
 
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> {
     private List<MenuItem> mMenuItems;
+    private Activity       mActivity;
 
-    public MenuAdapter(List<MenuItem> menuItems) {
+    public MenuAdapter(Activity activity, List<MenuItem> menuItems) {
         mMenuItems = menuItems;
+        mActivity = activity;
     }
 
     @Override
@@ -30,7 +36,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> 
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        MenuItem menuItem = mMenuItems.get(position);
+        final MenuItem menuItem = mMenuItems.get(position);
         holder.mItemImage.setImageBitmap(menuItem.getItemImage());
         holder.mName.setText(menuItem.getName());
         holder.mDescription.setText(menuItem.getDescription());
@@ -38,6 +44,21 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> 
         holder.mTags.setText(menuItem.getTagsCount());
         holder.mVotes.setText(menuItem.getVotesCount());
         holder.mComments.setText(menuItem.getCommentsCount());
+        holder.mRestaurant.setText(menuItem.getRestaurant().getName());
+        holder.mRestaurant.setMovementMethod(LinkMovementMethod.getInstance());
+        holder.mRestaurant.setPaintFlags(holder.mRestaurant.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+        holder.mRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mActivity, MapsActivity.class);
+                intent.putExtra("Lat", menuItem.getRestaurant().getLat());
+                intent.putExtra("Lng", menuItem.getRestaurant().getLng());
+                intent.putExtra("Title", menuItem.getRestaurant().getName());
+                intent.putExtra("Stars", menuItem.getRestaurant().getStars());
+                mActivity.startActivity(intent);
+            }
+        });
         for (int i = 0; i < holder.mImageStars.size(); i++) {
             if (menuItem.getRating() - 1 < i) {
                 holder.mImageStars.get(i).setImageResource(R.drawable.empty_star_icon);
@@ -45,6 +66,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> 
                 holder.mImageStars.get(i).setImageResource(R.drawable.full_star_icon);
             }
         }
+
     }
 
     @Override
@@ -52,7 +74,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> 
         return mMenuItems.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    class MyViewHolder extends RecyclerView.ViewHolder {
         private ArrayList<ImageView> mImageStars = new ArrayList<>();
         private ImageView mItemImage;
         private TextView  mName;
@@ -60,8 +82,9 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> 
         private TextView  mVotes;
         private TextView  mComments;
         private TextView  mTags;
+        private TextView  mRestaurant;
 
-        public MyViewHolder(View view) {
+        MyViewHolder(View view) {
             super(view);
             mImageStars.add((ImageView) view.findViewById(R.id.star_1));
             mImageStars.add((ImageView) view.findViewById(R.id.star_2));
@@ -75,6 +98,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> 
             mVotes = (TextView) view.findViewById(R.id.vote_count);
             mComments = (TextView) view.findViewById(R.id.comment_count);
             mTags = (TextView) view.findViewById(R.id.tag_count);
+            mRestaurant = (TextView) view.findViewById(R.id.restaurant);
         }
     }
 }

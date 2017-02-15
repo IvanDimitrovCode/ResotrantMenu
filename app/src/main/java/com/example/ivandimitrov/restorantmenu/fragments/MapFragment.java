@@ -67,7 +67,7 @@ public class MapFragment extends Fragment {
                     // Defines the contents of the InfoWindow
                     @Override
                     public View getInfoContents(Marker marker) {
-                        View v = getActivity().getLayoutInflater().inflate(R.layout.windowlayout, null);
+                        View v = getActivity().getLayoutInflater().inflate(R.layout.map_window_layout, null);
                         String stars = marker.getSnippet();
                         TextView restaurantView = (TextView) v.findViewById(R.id.restaurant_name);
                         restaurantView.setText(marker.getTitle());

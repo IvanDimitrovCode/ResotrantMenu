@@ -23,15 +23,17 @@ import java.util.ArrayList;
  */
 
 public class FoodFragment extends Fragment {
+    private static final int                 HIDE_THRESHOLD = 20;
+    private              ArrayList<MenuItem> mMenuItems     = new ArrayList<>();
+    private static ScrollListener mListener;
+    private int     scrolledDistance = 0;
+    private boolean controlsVisible  = true;
 
-
-    private ArrayList<MenuItem> mMenuItems = new ArrayList<>();
-    private RecyclerView mRecyclerView;
-    private MenuAdapter  mMenuAdapter;
-
-    public static final Fragment newInstance(int message) {
+    public static final Fragment newInstance(int message, ScrollListener listener) {
         FoodFragment fragment = new FoodFragment();
         Bundle bdl = new Bundle();
+        mListener = listener;
+//        bdl.putParcelable("asd",pagerTabStrip.parc);
         bdl.putInt("pageType", message);
         fragment.setArguments(bdl);
         return fragment;
@@ -40,6 +42,7 @@ public class FoodFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.soup_fragment, container, false);
+
         int pageType = getArguments().getInt("pageType");
         switch (pageType) {
             case MainActivity.SOUP_PAGE:
@@ -54,12 +57,40 @@ public class FoodFragment extends Fragment {
             default:
                 break;
         }
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.my_recycler_view);
-        mMenuAdapter = new MenuAdapter(getActivity(), mMenuItems);
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.my_recycler_view);
+        MenuAdapter menuAdapter = new MenuAdapter(getActivity(), mMenuItems);
+        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+                //show views if first item is first visible position and views are hidden
+                if (firstVisibleItem == 0) {
+                    if (!controlsVisible) {
+                        mListener.onShow();
+                        controlsVisible = true;
+                    }
+                } else {
+                    if (scrolledDistance > HIDE_THRESHOLD && controlsVisible) {
+                        mListener.onHide();
+                        controlsVisible = false;
+                        scrolledDistance = 0;
+                    } else if (scrolledDistance < -HIDE_THRESHOLD && !controlsVisible) {
+                        mListener.onShow();
+                        controlsVisible = true;
+                        scrolledDistance = 0;
+                    }
+                }
+
+                if ((controlsVisible && dy > 0) || (!controlsVisible && dy < 0)) {
+                    scrolledDistance += dy;
+                }
+            }
+        });
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mMenuAdapter);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(menuAdapter);
         return v;
     }
 
@@ -71,6 +102,18 @@ public class FoodFragment extends Fragment {
         mMenuItems.add(new MenuItem(BitmapFactory.decodeResource(getResources(), R.drawable.cream_soup2)
                 , "CreamSoup 2", "Traditional soup from a not so special recipe"
                 , "45", "12", "18", 0, restaurant));
+        mMenuItems.add(new MenuItem(BitmapFactory.decodeResource(getResources(), R.drawable.cream_soup3)
+                , "CreamSoup 3", "Special soup from a awesome recipe"
+                , "178", "15", "33", 5, restaurant));
+        mMenuItems.add(new MenuItem(BitmapFactory.decodeResource(getResources(), R.drawable.cream_soup3)
+                , "CreamSoup 3", "Special soup from a awesome recipe"
+                , "178", "15", "33", 5, restaurant));
+        mMenuItems.add(new MenuItem(BitmapFactory.decodeResource(getResources(), R.drawable.cream_soup3)
+                , "CreamSoup 3", "Special soup from a awesome recipe"
+                , "178", "15", "33", 5, restaurant));
+        mMenuItems.add(new MenuItem(BitmapFactory.decodeResource(getResources(), R.drawable.cream_soup3)
+                , "CreamSoup 3", "Special soup from a awesome recipe"
+                , "178", "15", "33", 5, restaurant));
         mMenuItems.add(new MenuItem(BitmapFactory.decodeResource(getResources(), R.drawable.cream_soup3)
                 , "CreamSoup 3", "Special soup from a awesome recipe"
                 , "178", "15", "33", 5, restaurant));
@@ -107,5 +150,11 @@ public class FoodFragment extends Fragment {
         mMenuItems.add(new MenuItem(BitmapFactory.decodeResource(getResources(), R.drawable.cake)
                 , "Cake", "Its like diebiteies in a plate"
                 , "178", "15", "33", 5, restaurant));
+    }
+
+    public interface ScrollListener {
+        void onShow();
+
+        void onHide();
     }
 }

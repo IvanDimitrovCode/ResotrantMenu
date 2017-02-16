@@ -19,6 +19,11 @@ import java.util.List;
  */
 
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> {
+    public static final String BUNDLE_KEY_LAT   = "Lat";
+    public static final String BUNDLE_KEY_LNG   = "Lng";
+    public static final String BUNDLE_KEY_TITLE = "Title";
+    public static final String BUNDLE_KEY_STARS = "Stars";
+
     private List<MenuItem> mMenuItems;
     private Activity       mActivity;
 
@@ -52,10 +57,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MyViewHolder> 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mActivity, MapsActivity.class);
-                intent.putExtra("Lat", menuItem.getRestaurant().getLat());
-                intent.putExtra("Lng", menuItem.getRestaurant().getLng());
-                intent.putExtra("Title", menuItem.getRestaurant().getName());
-                intent.putExtra("Stars", menuItem.getRestaurant().getStars());
+                intent.putExtra(BUNDLE_KEY_LAT, menuItem.getRestaurant().getLat());
+                intent.putExtra(BUNDLE_KEY_LNG, menuItem.getRestaurant().getLng());
+                intent.putExtra(BUNDLE_KEY_TITLE, menuItem.getRestaurant().getName());
+                intent.putExtra(BUNDLE_KEY_STARS, menuItem.getRestaurant().getStars());
                 mActivity.startActivity(intent);
             }
         });

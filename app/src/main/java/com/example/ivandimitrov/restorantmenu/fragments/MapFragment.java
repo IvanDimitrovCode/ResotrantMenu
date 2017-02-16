@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 public class MapFragment extends Fragment {
     private MapView   mMapView;
-    private GoogleMap googleMap;
+    private GoogleMap mGoogleMap;
 
     public static final Fragment newInstance() {
         MapFragment fragment = new MapFragment();
@@ -40,6 +40,7 @@ public class MapFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.map_fragment
                 , container, false);
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
+
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
 
@@ -48,6 +49,8 @@ public class MapFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // iznesi vsi4kitre modeli otvan - izvan i v masiv
         final RestaurantNode restaurant1 = new RestaurantNode("Supa Star", 42.692513, 23.330136, 5);
         final RestaurantNode restaurant2 = new RestaurantNode("Niagara", 42.678944, 23.291101, 4);
         final RestaurantNode restaurant3 = new RestaurantNode("Bordo", 42.679807, 23.239824, 3);
@@ -55,9 +58,9 @@ public class MapFragment extends Fragment {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
-                googleMap = mMap;
+                mGoogleMap = mMap;
                 LatLng sofiaCenter = new LatLng(42.696845, 23.320943);
-                googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                mGoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
                     @Override
                     public View getInfoWindow(Marker arg0) {
@@ -89,12 +92,12 @@ public class MapFragment extends Fragment {
                         return v;
                     }
                 });
-                googleMap.addMarker(new MarkerOptions().snippet("" + restaurant1.getStars()).position(new LatLng(restaurant1.getLat(), restaurant1.getLng())).title(restaurant1.getName()));
-                googleMap.addMarker(new MarkerOptions().snippet("" + restaurant2.getStars()).position(new LatLng(restaurant2.getLat(), restaurant2.getLng())).title(restaurant2.getName()));
-                googleMap.addMarker(new MarkerOptions().snippet("" + restaurant3.getStars()).position(new LatLng(restaurant3.getLat(), restaurant3.getLng())).title(restaurant3.getName()));
+                mGoogleMap.addMarker(new MarkerOptions().snippet("" + restaurant1.getStars()).position(new LatLng(restaurant1.getLat(), restaurant1.getLng())).title(restaurant1.getName()));
+                mGoogleMap.addMarker(new MarkerOptions().snippet("" + restaurant2.getStars()).position(new LatLng(restaurant2.getLat(), restaurant2.getLng())).title(restaurant2.getName()));
+                mGoogleMap.addMarker(new MarkerOptions().snippet("" + restaurant3.getStars()).position(new LatLng(restaurant3.getLat(), restaurant3.getLng())).title(restaurant3.getName()));
 
                 CameraPosition cameraPosition = new CameraPosition.Builder().target(sofiaCenter).zoom(12).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
 

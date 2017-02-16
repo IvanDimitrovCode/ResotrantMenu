@@ -11,6 +11,12 @@ import java.util.List;
  */
 
 public class MenuPageAdapter extends FragmentPagerAdapter {
+    public static final String PAGE_SOUPS      = "Soups";
+    public static final String PAGE_MAIN       = "Main dish";
+    public static final String PAGE_DESSERTS   = "Desserts";
+    public static final String PAGE_RESTAURANT = "Restaurant";
+    public static final String PAGE_PAGE_ERROR = "PAGE ERROR";
+
     private List<Fragment> fragments;
 
     public MenuPageAdapter(FragmentManager fm, List<Fragment> fragments) {
@@ -31,16 +37,16 @@ public class MenuPageAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position) {
-            case 0:
-                return "Soups";
-            case 1:
-                return "Main dish";
-            case 2:
-                return "Desserts";
-            case 3:
-                return "Restaurants";
+            case MainActivity.SOUP_PAGE:
+                return PAGE_SOUPS;
+            case MainActivity.MAIN_DISH_PAGE:
+                return PAGE_MAIN;
+            case MainActivity.DESSERT_PAGE:
+                return PAGE_DESSERTS;
+            case MainActivity.RESTAURANT_PAGE:
+                return PAGE_RESTAURANT;
             default:
-                return "PAGE ERROR";
+                return PAGE_PAGE_ERROR;
         }
     }
 }

@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+    public static final String STARTING_MARKER_LABEL = "Sofia Center";
     private GoogleMap mMap;
     private double    mLat;
     private double    mLng;
@@ -23,10 +24,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        mLat = getIntent().getExtras().getDouble("Lat");
-        mLng = getIntent().getExtras().getDouble("Lng");
-        int stars = getIntent().getExtras().getInt("Stars");
-        String title = getIntent().getExtras().getString("Title");
+        mLat = getIntent().getExtras().getDouble(MenuAdapter.BUNDLE_KEY_LAT);
+        mLng = getIntent().getExtras().getDouble(MenuAdapter.BUNDLE_KEY_LNG);
+        int stars = getIntent().getExtras().getInt(MenuAdapter.BUNDLE_KEY_STARS);
+        String title = getIntent().getExtras().getString(MenuAdapter.BUNDLE_KEY_TITLE);
         TextView titleView = (TextView) findViewById(R.id.title);
         titleView.setText(title);
         ArrayList<ImageView> imageStars = new ArrayList<>();
@@ -50,8 +51,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng sydney = new LatLng(mLat, mLng);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Restaurant"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney, 18.0f));
+        LatLng startingCoordinates = new LatLng(mLat, mLng);
+        mMap.addMarker(new MarkerOptions().position(startingCoordinates).title(STARTING_MARKER_LABEL));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(startingCoordinates, 18.0f));
     }
 }

@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,18 +24,16 @@ import java.util.ArrayList;
  */
 
 public class FoodFragment extends Fragment {
-    private static final int                 HIDE_THRESHOLD = 20;
-    private              ArrayList<MenuItem> mMenuItems     = new ArrayList<>();
-    private static ScrollListener mListener;
-    private int     scrolledDistance = 0;
-    private boolean controlsVisible  = true;
+    public static final String BUNDLE_KEY_MESSAGE_TYPE = "pageType";
 
-    public static final Fragment newInstance(int message, ScrollListener listener) {
+    private ArrayList<MenuItem> mMenuItems = new ArrayList<>();
+    RecyclerView mRecyclerView;
+    MenuAdapter  mMenuAdapter;
+
+    public static final Fragment newInstance(int message) {
         FoodFragment fragment = new FoodFragment();
         Bundle bdl = new Bundle();
-        mListener = listener;
-//        bdl.putParcelable("asd",pagerTabStrip.parc);
-        bdl.putInt("pageType", message);
+        bdl.putInt(BUNDLE_KEY_MESSAGE_TYPE, message);
         fragment.setArguments(bdl);
         return fragment;
     }
@@ -43,7 +42,7 @@ public class FoodFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.soup_fragment, container, false);
 
-        int pageType = getArguments().getInt("pageType");
+        int pageType = getArguments().getInt(BUNDLE_KEY_MESSAGE_TYPE);
         switch (pageType) {
             case MainActivity.SOUP_PAGE:
                 initMenuSoup();
@@ -57,41 +56,25 @@ public class FoodFragment extends Fragment {
             default:
                 break;
         }
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.my_recycler_view);
-        MenuAdapter menuAdapter = new MenuAdapter(getActivity(), mMenuItems);
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int firstVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
-                //show views if first item is first visible position and views are hidden
-                if (firstVisibleItem == 0) {
-                    if (!controlsVisible) {
-                        mListener.onShow();
-                        controlsVisible = true;
-                    }
-                } else {
-                    if (scrolledDistance > HIDE_THRESHOLD && controlsVisible) {
-                        mListener.onHide();
-                        controlsVisible = false;
-                        scrolledDistance = 0;
-                    } else if (scrolledDistance < -HIDE_THRESHOLD && !controlsVisible) {
-                        mListener.onShow();
-                        controlsVisible = true;
-                        scrolledDistance = 0;
-                    }
-                }
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.my_recycler_view);
+        mMenuAdapter = new MenuAdapter(getActivity(), mMenuItems);
 
-                if ((controlsVisible && dy > 0) || (!controlsVisible && dy < 0)) {
-                    scrolledDistance += dy;
-                }
-            }
-        });
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(menuAdapter);
+        if (getResources().getBoolean(R.bool.isTablet)) {
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        } else {
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mMenuAdapter);
         return v;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mRecyclerView = null;
+        mMenuAdapter = null;
+        mMenuItems = null;
     }
 
     private void initMenuSoup() {
@@ -150,11 +133,5 @@ public class FoodFragment extends Fragment {
         mMenuItems.add(new MenuItem(BitmapFactory.decodeResource(getResources(), R.drawable.cake)
                 , "Cake", "Its like diebiteies in a plate"
                 , "178", "15", "33", 5, restaurant));
-    }
-
-    public interface ScrollListener {
-        void onShow();
-
-        void onHide();
     }
 }

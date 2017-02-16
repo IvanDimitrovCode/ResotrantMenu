@@ -1,19 +1,19 @@
 package com.example.ivandimitrov.restorantmenu;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.animation.AccelerateInterpolator;
+import android.support.v7.graphics.Palette;
+import android.support.v7.widget.Toolbar;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
 
 import com.example.ivandimitrov.restorantmenu.fragments.FoodFragment;
 import com.example.ivandimitrov.restorantmenu.fragments.MapFragment;
@@ -21,44 +21,75 @@ import com.example.ivandimitrov.restorantmenu.fragments.MapFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements FoodFragment.ScrollListener {
+public class MainActivity extends AppCompatActivity {
     public static final int SOUP_PAGE       = 0;
     public static final int MAIN_DISH_PAGE  = 1;
     public static final int DESSERT_PAGE    = 2;
     public static final int RESTAURANT_PAGE = 3;
 
-    private Animation     mFadeOutAnimation;
-    private Animation     mFadeInAnimation;
-    private PagerTabStrip pagerTabStrip;
-    private int mCurrentPageBackground = SOUP_PAGE;
-    private ImageView mGradientEffect;
+
+    private int     mCurrentPageBackground = SOUP_PAGE;
+    private boolean isToolbarCollapsed     = false;
+
+    private Animation mFadeOutAnimation;
+    private Animation mFadeInAnimation;
+
+    //=====LISTENERS=====
+    private AppBarLayout.OnOffsetChangedListener mCollapseListener;
+    private Palette.PaletteAsyncListener         mPaletteListener;
+    private TabLayout.OnTabSelectedListener      mTabSelectedListener;
+    private Animation.AnimationListener          mAnimationListener;
+    private ViewPager                            viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        List<Fragment> fragments = getFragments();
-        final MenuPageAdapter pageAdapter = new MenuPageAdapter(getSupportFragmentManager(), fragments);
-        final ViewPager pager = (ViewPager) findViewById(R.id.viewpager);
-        pagerTabStrip = (PagerTabStrip) findViewById(R.id.pager_header);
+        mCurrentPageBackground = R.drawable.soup_background;
+
         mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
         mFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
+        final AppBarLayout collapsedBar = (AppBarLayout) findViewById(R.id.htab_appbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.htab_toolbar);
+        setSupportActionBar(toolbar);
+        final List<Fragment> fragments = getFragments();
+        final MenuPageAdapter pageAdapter = new MenuPageAdapter(getSupportFragmentManager(), fragments);
+        viewPager = (ViewPager) findViewById(R.id.htab_viewpager);
+        final TabLayout tabLayout = (TabLayout) findViewById(R.id.htab_tabs);
+        tabLayout.setupWithViewPager(viewPager);
 
-        mGradientEffect = (ImageView) findViewById(R.id.gradient_effect);
-        pagerTabStrip.setBackgroundResource(R.drawable.soup_background);
-        pagerTabStrip.setTextColor(Color.WHITE);
-        mCurrentPageBackground = R.drawable.soup_background;
-        pager.setOffscreenPageLimit(3);
-        pager.setAdapter(pageAdapter);
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            public void onPageScrollStateChanged(int state) {
+        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.htab_collapse_toolbar);
+        collapsingToolbarLayout.setTitleEnabled(false);
+        collapsingToolbarLayout.setBackgroundResource(R.drawable.soup_background);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.soup_background);
+        mPaletteListener = new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                int vibrantColor = palette.getVibrantColor(Color.YELLOW);
+                int vibrantDarkColor = palette.getDarkVibrantColor(Color.YELLOW);
+                collapsingToolbarLayout.setContentScrimColor(vibrantColor);
+                collapsingToolbarLayout.setStatusBarScrimColor(vibrantDarkColor);
             }
+        };
+        Palette.from(bitmap).generate(mPaletteListener);
 
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        mCollapseListener = new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (verticalOffset == 0) {
+                    isToolbarCollapsed = false;
+                } else {
+                    isToolbarCollapsed = true;
+                }
             }
-
-            public void onPageSelected(int position) {
-                switch (position) {
+        };
+        collapsedBar.addOnOffsetChangedListener(mCollapseListener);
+        mTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+                switch (tab.getPosition()) {
                     case SOUP_PAGE:
                         mCurrentPageBackground = R.drawable.soup_background;
                         break;
@@ -71,59 +102,66 @@ public class MainActivity extends AppCompatActivity implements FoodFragment.Scro
                     case RESTAURANT_PAGE:
                         mCurrentPageBackground = R.drawable.restaurant_background;
                         break;
-                    default:
-                        mCurrentPageBackground = 0;
-                        break;
                 }
-
-                mFadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+                mAnimationListener = new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
                     }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        pagerTabStrip.startAnimation(mFadeInAnimation);
-                        pagerTabStrip.setBackgroundResource(mCurrentPageBackground);
+                        collapsingToolbarLayout.startAnimation(mFadeInAnimation);
+                        collapsingToolbarLayout.setBackgroundResource(mCurrentPageBackground);
                     }
 
                     @Override
                     public void onAnimationRepeat(Animation animation) {
 
                     }
-                });
-                pagerTabStrip.startAnimation(mFadeOutAnimation);
+                };
+                mFadeOutAnimation.setAnimationListener(mAnimationListener);
+
+                if (!isToolbarCollapsed) {
+                    collapsingToolbarLayout.startAnimation(mFadeOutAnimation);
+                } else {
+                    collapsingToolbarLayout.setBackgroundResource(mCurrentPageBackground);
+                }
             }
-        });
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        };
+        tabLayout.setOnTabSelectedListener(mTabSelectedListener);
+
+        viewPager.setOffscreenPageLimit(3);
+        viewPager.setAdapter(pageAdapter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mCollapseListener = null;
+        mPaletteListener = null;
+        mTabSelectedListener = null;
+        mAnimationListener = null;
+        viewPager = null;
+        mFadeOutAnimation = null;
+        mFadeInAnimation = null;
+
     }
 
     private List<Fragment> getFragments() {
         List<Fragment> fList = new ArrayList<>();
-        fList.add(FoodFragment.newInstance(SOUP_PAGE, this));
-        fList.add(FoodFragment.newInstance(MAIN_DISH_PAGE, this));
-        fList.add(FoodFragment.newInstance(DESSERT_PAGE, this));
+        fList.add(FoodFragment.newInstance(SOUP_PAGE));
+        fList.add(FoodFragment.newInstance(MAIN_DISH_PAGE));
+        fList.add(FoodFragment.newInstance(DESSERT_PAGE));
         fList.add(MapFragment.newInstance());
         return fList;
-    }
-
-    @Override
-    public void onShow() {
-        pagerTabStrip.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-        mGradientEffect.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-        pagerTabStrip.setVisibility(View.VISIBLE);
-        mGradientEffect.setVisibility(View.VISIBLE);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    @Override
-    public void onHide() {
-        pagerTabStrip.animate().translationY(-pagerTabStrip.getHeight()).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                pagerTabStrip.setVisibility(View.GONE);
-                mGradientEffect.setVisibility(View.GONE);
-            }
-        }).setInterpolator(new AccelerateInterpolator(2));
-        mGradientEffect.animate().translationY(-mGradientEffect.getHeight()).setInterpolator(new AccelerateInterpolator(2));
     }
 }
